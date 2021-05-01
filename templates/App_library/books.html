@@ -1,0 +1,249 @@
+{% extends 'App_library/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+{% block body %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <style>
+        .paddy {
+            padding: 10px !important;
+            text-align: center !important;
+        }
+
+        .wrap-input100 {
+            width: 100%;
+            position: relative;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.24);
+            margin-bottom: 30px;
+        }
+
+        .input100 {
+            font-family: Poppins-Regular, sans-serif;
+            font-size: 16px;
+            color: #fff;
+            line-height: 1.2;
+
+            display: block;
+            width: 100%;
+            height: 45px;
+            background: transparent;
+            padding: 0 5px 0 38px;
+        }
+
+        /*---------------------------------------------*/
+        .focus-input100 {
+            position: absolute;
+            display: block;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .focus-input100::before {
+            content: "";
+            display: block;
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+
+            -webkit-transition: all 0.4s;
+            -o-transition: all 0.4s;
+            -moz-transition: all 0.4s;
+            transition: all 0.4s;
+
+            background: #fff;
+        }
+
+        .focus-input100::after {
+            font-family: Material-Design-Iconic-Font, serif;
+            font-size: 22px;
+            color: #fff;
+
+            content: attr(data-placeholder);
+            display: block;
+            width: 100%;
+            position: absolute;
+            top: 6px;
+            left: 0px;
+            padding-left: 5px;
+
+            -webkit-transition: all 0.4s;
+            -o-transition: all 0.4s;
+            -moz-transition: all 0.4s;
+            transition: all 0.4s;
+        }
+
+        .input100:focus {
+            padding-left: 5px;
+        }
+
+        .input100:focus {
+            top: -22px;
+            font-size: 18px;
+        }
+
+        .input100:focus {
+            width: 100%;
+        }
+    </style>
+
+    <div class="container">
+        <div class="container" style="padding: 100px !important;" id="table-div">
+            <div class="h1" id="header">All Books</div>
+            <button type="button" id="add_book" class="btn btn-success bg-dark"
+                    style="padding: 10px!important; background-color: #5cb85c!important; margin: 10px 0 10px 0 !important;"
+                    onclick="openForm()">
+                Add New Book
+            </button>
+            <button type="button" id="add_bookself" class="btn btn-success" onclick="openBookSelfForm()"
+                    style="padding: 10px!important; background-color: #5cb85c!important; margin: 10px 0 10px 0 !important;">
+                Add NewBook-self
+            </button>
+            <!------ Bootstrap 5 Table Starts --------->
+            <table class="table table-hover" id="book-table">
+                {% if books %}
+                    <thead>
+                    <tr style="text-align: center;">
+                        <th scope="col" class="paddy">Book Title</th>
+                        <th scope="col" class="paddy">Category</th>
+                        <th scope="col" class="paddy">Author</th>
+                        <th scope="col" class="paddy">Description</th>
+                        <th scope="col" class="paddy">Available</th>
+                        <th scope="col" class="paddy">Action</th>
+                    </tr>
+                    </thead>
+                {% else %}
+                    <h1 id="no_book">No Books In My Library</h1>
+                {% endif %}
+                <tbody>
+                {% if books %}
+                    {% for book in books %}
+                        <tr style="text-align: center;">
+                            <td class="paddy">{{ book.title }}</td>
+                            <td class="paddy">{{ book.categories }}</td>
+                            <td class="paddy">{{ book.author }}</td>
+                            <td class="paddy">{{ book.description|range_filter|linebreaks }}</td>
+                            <td class="paddy">{{ book.available }}</td>
+                            <td class="paddy"><a class="btn btn-danger delbook_id"
+                                                 href="{% url 'App_library:delete_book' book.id %}"
+                                                 style="color: #ffffff!important;">Delete</a> /
+                                <a href="{% url 'App_library:edit_book' pk=book.pk %}" data-id="{{ book.id }}"
+                                   class="btn btn-warning editButton ebook_id" style="color: #ffffff!important;">
+                                    Edit</a></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+            <!------ Table Ends ------->
+            <div id="book_form" style="display:none;">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-lg-10">
+                        <form id="form" method="POST" action="{% url 'App_library:books' %}"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <legend style="text-align: center; font-size: 30px; font-weight: 600;">New Book Form
+                            </legend>
+                            <fieldset class="form-group">
+                                <div class="wrap-input100 validate-input" data-validate="Book Title">
+                                    {% render_field form.title class="form-control input100" type="text" name="title" placeholder="Book title" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Book Category">
+                                    {% render_field form.categories class="form-control input100" type="text" name="category" placeholder="Category" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Book Cover">
+                                    {% render_field form.cover class="form-control input100" type="file" name="cover" placeholder="Cover" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Author">
+                                    {% render_field form.author class="form-control input100" type="text" name="author" placeholder="Book Author" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Book Title">
+                                    {% render_field form.description class="form-control input100" type="text" name="description" placeholder="Book Description" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Available in store">
+                                    {% render_field form.available class="form-control input100" type="text" name="available" placeholder="Available" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Book-self No.">
+                                    {% render_field form.location class="form-control input100" type="text" name="location" placeholder="Book-self No." %}
+                                </div>
+                            </fieldset>
+                            <button name="save_book" id="save_book" type="submit" class="btn btn-primary mt-3"
+                                    style="background: #5cb85c!important; padding: 10px!important;"><span
+                                    class="glyphicon glyphicon-save"></span>
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+            <div id="bookself_form" style="display:none;">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-lg-10">
+                        <form id="form" method="POST" action="{% url 'App_library:books' %}"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <legend style="text-align: center; font-size: 30px; font-weight: 600;">New BookSelf Form
+                            </legend>
+                            <fieldset class="form-group">
+                                <div class="wrap-input100 validate-input" data-validate="Bookself Number">
+                                    {% render_field bookself.self_no class="form-control input100" type="text" name="self_no" placeholder="Bookself Number" %}
+                                </div>
+                                <div class="wrap-input100 validate-input" data-validate="Self Row">
+                                    {% render_field bookself.row_no class="form-control input100" type="text" name="row_no" placeholder="Row Number" %}
+                                </div>
+                            </fieldset>
+                            <button name="save_bookself" id="save_book" type="submit" class="btn btn-primary mt-3"
+                                    style="background: #5cb85c!important; padding: 10px!important;">
+                                save
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!----- JavaScript ----->
+    <script>
+        let bookForm = document.getElementById('book_form');
+        let booktable = document.getElementById('book-table');
+        let bookself_form = document.getElementById('bookself_form');
+
+        function openForm() {
+            booktable.style.display = 'none';
+            bookForm.style.display = 'block';
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('add_book').style.display = 'none';
+            document.getElementById('add_bookself').style.display = 'none';
+            document.getElementById('no_book').style.display = 'none';
+        }
+
+        function openBookSelfForm() {
+            booktable.style.display = 'none';
+            bookForm.style.display = 'none';
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('add_book').style.display = 'none';
+            document.getElementById('add_bookself').style.display = 'none';
+            document.getElementById('no_book').style.display = 'none';
+            bookself_form.style.display = 'block';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"
+            integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+            integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
+            crossorigin="anonymous"></script>
+{% endblock %}

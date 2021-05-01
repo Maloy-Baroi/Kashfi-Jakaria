@@ -1,0 +1,77 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
+.social_links {
+    padding: 5rem;
+    background: transparent !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    height: 90px;
+}
+
+.footer-social-media {
+    margin-top: 20px!important;
+}
+
+.social_links .combo {
+    transform: scale(0.9);
+    transition: 0.4s ease-in;
+    margin: 0 0.5rem;
+    height: 3em;
+    width: 3em;
+    line-height: 3em;
+}
+
+.combo .circle {
+    color: #f9f9f9;
+    transition: 0.4s ease-in;
+    font-size: 3em;
+}
+
+.combo .icon {
+    color: #444343;
+    font-size: 2rem;
+    transform: translateY(1px);
+    transition: 0.2s ease-in;
+}
+
+.combo:hover {
+    transform: scale(1.1);
+}
+
+.combo:hover,
+.combo:hover .icon {
+    color: white;
+}
+
+.ig:hover,
+.ig:hover .circle {
+    color: #e1306c;
+    /*background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);*/
+}
+
+.fb:hover,
+.fb:hover .circle {
+    color: #1877f2;
+}
+
+.yt:hover,
+.yt:hover .circle {
+    color: #f00;
+}
+
+.tw:hover,
+.tw:hover .circle {
+    color: rgb(29, 161, 242);
+}
+
+.li:hover,
+.li:hover .circle {
+    color: #0073b1;
+}
